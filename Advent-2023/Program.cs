@@ -1,4 +1,4 @@
 ﻿using Advent_2023;
 using System;
 
-Console.WriteLine(Solutions.Day1_2("../../../day1"));
+Console.WriteLine(Solutions.Day2_2("../../../day2"));

@@ -8,6 +8,7 @@ namespace Advent_2023
 {
     public static class Solutions
     {
+        // Day 1
         public static int Day1_1(string path)
         {
             string[] values = File.ReadAllLines(path);
@@ -67,6 +68,81 @@ namespace Advent_2023
                 output += int.Parse(indexValuePair.MinValue + indexValuePair.MaxValue);
             }
             //54100: solution
+            return output;
+        }
+
+        // Day 2
+        public static int Day2_1(string path)
+        {
+            Dictionary<string, int> cubeRules = new()
+            {
+                { "red", 12 },
+                { "green", 13 },
+                { "blue", 14 }
+            };
+            string[] values = File.ReadAllLines(path);
+            int output = 0;
+            foreach (var line in values)
+            {
+                string[] game = line.Split(':');
+                string[] sets = game[1].Split(';');
+                bool isGameValid = true;
+                foreach (var set in sets)
+                {
+                    Dictionary<string, int> cubeValuePairs = new()
+                    {
+                        { "red", 0 },
+                        { "green", 0 },
+                        { "blue", 0 }
+                    };
+                    string[] cubes = set.Split(',');
+                    foreach (var cube in cubes)
+                    {
+                        string[] cubeValues = cube.Trim().Split(' ');
+                        cubeValuePairs[cubeValues[1]] = int.Parse(cubeValues[0]);
+                    }
+                    if (cubeValuePairs["red"] > cubeRules["red"] || cubeValuePairs["green"] > cubeRules["green"] || cubeValuePairs["blue"] > cubeRules["blue"])
+                    {
+                        isGameValid = false;
+                        break;
+                    }
+                }
+                if (isGameValid)
+                    output += int.Parse(game[0].Split(' ')[1]);
+            }
+            //1734
+            return output;
+        }
+
+        public static int Day2_2(string path)
+        {
+            string[] values = File.ReadAllLines(path);
+            int output = 0;
+            foreach (var line in values)
+            {
+                string[] game = line.Split(':');
+                string[] sets = game[1].Split(';');
+                Dictionary<string, int> cubeValuePairs = new()
+                {
+                    { "red", 0 },
+                    { "green", 0 },
+                    { "blue", 0 }
+                };
+                foreach (var set in sets)
+                {
+                    string[] cubes = set.Split(',');
+                    foreach (var cube in cubes)
+                    {
+                        string[] cubeValues = cube.Trim().Split(' ');
+                        string cubeKey = cubeValues[1];
+                        int cubeValue = int.Parse(cubeValues[0]);
+                        if (cubeValue > cubeValuePairs[cubeKey])
+                            cubeValuePairs[cubeKey] = cubeValue;
+                    }
+                }
+                output += cubeValuePairs["red"] * cubeValuePairs["green"] * cubeValuePairs["blue"];
+            }
+            //70387
             return output;
         }
 
