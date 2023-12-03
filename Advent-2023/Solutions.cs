@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,24 +11,40 @@ namespace Advent_2023
     public static class Solutions
     {
         // Day 1
+        public struct IndexValuePair
+        {
+            public int MinIndex { get; set; }
+            public string MinValue { get; set; }
+            public int MaxIndex { get; set; }
+            public string MaxValue { get; set; }
+
+            public IndexValuePair()
+            {
+                MinIndex = int.MaxValue;
+                MinValue = "";
+                MaxIndex = int.MinValue;
+                MaxValue = "";
+            }
+        }
+
         public static int Day1_1(string path)
         {
-            string[] values = File.ReadAllLines(path);
+            string[] lines = File.ReadAllLines(path);
             string[] testCases = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             int output = 0;
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 IndexValuePair indexValuePair = new IndexValuePair();
                 for (int j = 0; j < testCases.Length; j++)
                 {
-                    int caseIndexFirst = values[i].IndexOf(testCases[j]);
+                    int caseIndexFirst = lines[i].IndexOf(testCases[j]);
                     if (caseIndexFirst != -1 && caseIndexFirst < indexValuePair.MinIndex)
                     {
                         indexValuePair.MinIndex = caseIndexFirst;
                         indexValuePair.MinValue = testCases[j];
                     }
 
-                    int caseIndexLast = values[i].LastIndexOf(testCases[j]);
+                    int caseIndexLast = lines[i].LastIndexOf(testCases[j]);
                     if (caseIndexLast != -1 && caseIndexLast > indexValuePair.MaxIndex)
                     {
                         indexValuePair.MaxIndex = caseIndexLast;
@@ -40,24 +58,25 @@ namespace Advent_2023
             //54877
             return output;
         }
+
         public static int Day1_2(string path)
         {
-            string[] values = File.ReadAllLines(path);
+            string[] lines = File.ReadAllLines(path);
             string[] testCases = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
             int output = 0;
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 IndexValuePair indexValuePair = new IndexValuePair();
                 for (int j = 0; j < testCases.Length; j++)
                 {
-                    int caseIndexFirst = values[i].IndexOf(testCases[j]);
+                    int caseIndexFirst = lines[i].IndexOf(testCases[j]);
                     if (caseIndexFirst != -1 && indexValuePair.MinIndex > caseIndexFirst)
                     {
                         indexValuePair.MinIndex = caseIndexFirst;
                         indexValuePair.MinValue = WordToNumber(testCases[j]);
                     }
 
-                    int caseIndexLast = values[i].LastIndexOf(testCases[j]);
+                    int caseIndexLast = lines[i].LastIndexOf(testCases[j]);
                     if (caseIndexLast != -1 && indexValuePair.MaxIndex < caseIndexLast)
                     {
                         indexValuePair.MaxIndex = caseIndexLast;
@@ -87,34 +106,18 @@ namespace Advent_2023
                 _ => word,
             };
         }
-        public struct IndexValuePair
-        {
-            public int MinIndex { get; set; }
-            public string MinValue { get; set; }
-            public int MaxIndex { get; set; }
-            public string MaxValue { get; set; }
-
-            public IndexValuePair()
-            {
-                MinIndex = int.MaxValue;
-                MinValue = "";
-                MaxIndex = int.MinValue;
-                MaxValue = "";
-            }
-        }
 
         // Day 2
         public static int Day2_1(string path)
         {
-            Dictionary<string, int> cubeRules = new()
-            {
+            ReadOnlyDictionary<string, int> cubeRules = new(new Dictionary<string, int>() {
                 { "red", 12 },
                 { "green", 13 },
                 { "blue", 14 }
-            };
-            string[] values = File.ReadAllLines(path);
+            });
+            string[] lines = File.ReadAllLines(path);
             int output = 0;
-            foreach (var line in values)
+            foreach (var line in lines)
             {
                 string[] game = line.Split(':');
                 string[] sets = game[1].Split(';');
@@ -145,11 +148,12 @@ namespace Advent_2023
             //1734
             return output;
         }
+
         public static int Day2_2(string path)
         {
-            string[] values = File.ReadAllLines(path);
+            string[] lines = File.ReadAllLines(path);
             int output = 0;
-            foreach (var line in values)
+            foreach (var line in lines)
             {
                 string[] game = line.Split(':');
                 string[] sets = game[1].Split(';');
@@ -177,167 +181,7 @@ namespace Advent_2023
             return output;
         }
 
-        //Day 3
-        public static int Day3_1(string path)
-        {
-            string[] values = File.ReadAllLines(path);
-            int output = 0;
-
-            for (int i = 0; i < values.Length; i++)
-            {
-                string line = values[i];
-                NumberInEngine engineNum = new();
-                for (int j = 0; j < line.Length; j++)
-                {
-                    if (int.TryParse(line[j].ToString(), out int num))
-                    {
-                        if (string.IsNullOrEmpty(engineNum.NumberString))
-                        {
-                            engineNum = new NumberInEngine(num.ToString(), j, i, 1);
-                            continue;
-                        }
-                        engineNum.NumberString += num;
-                        engineNum.Length++;
-                        if (j != line.Length - 1)
-                            continue;
-                    }
-                    if (string.IsNullOrEmpty(engineNum.NumberString))
-                        continue;
-                    if (AdjecentToSymbol(engineNum, values))
-                        output += int.Parse(engineNum.NumberString);
-                    engineNum = new();
-                }
-            }
-            //560670
-            return output;
-        }
-        //Can be shortened
-        private static bool AdjecentToSymbol(NumberInEngine engineNum, string[] lines)
-        {
-            string line = lines[engineNum.LineIndex];
-            if (engineNum.LineIndex != 0)
-            {
-                for (int k = engineNum.StartIndex - 1; k < engineNum.StartIndex + engineNum.Length + 1; k++)
-                {
-                    if (k < 0 || k >= line.Length)
-                        continue;
-                    if (lines[engineNum.LineIndex - 1][k] != '.')
-                        return true;
-                }
-            }
-            if (engineNum.LineIndex != lines.Length - 1)
-            {
-                for (int k = engineNum.StartIndex - 1; k < engineNum.StartIndex + engineNum.Length + 1; k++)
-                {
-                    if (k < 0 || k >= line.Length)
-                        continue;
-                    if (lines[engineNum.LineIndex + 1][k] != '.')
-                        return true;
-                }
-                if (engineNum.StartIndex != 0)
-                {
-                    if (lines[engineNum.LineIndex][engineNum.StartIndex - 1] != '.')
-                        return true;
-                }
-                if (engineNum.StartIndex + engineNum.Length < line.Length)
-                {
-                    if (lines[engineNum.LineIndex][engineNum.StartIndex + engineNum.Length] != '.')
-                        return true;
-                }
-            }
-            return false;
-        }
-        public static int Day3_2(string path)
-        {
-            string[] values = File.ReadAllLines(path);
-            int output = 0;
-
-            Dictionary<string, int> numberGears = new();
-
-            for (int i = 0; i < values.Length; i++)
-            {
-                string line = values[i];
-                NumberInEngine engineNum = new();
-                for (int j = 0; j < line.Length; j++)
-                {
-                    if (int.TryParse(line[j].ToString(), out int num))
-                    {
-                        if (string.IsNullOrEmpty(engineNum.NumberString))
-                        {
-                            engineNum = new NumberInEngine(num.ToString(), j, i, 1);
-                            continue;
-                        }
-                        engineNum.NumberString += num;
-                        engineNum.Length++;
-                        if (j != line.Length - 1)
-                            continue;
-                    }
-                    if (string.IsNullOrEmpty(engineNum.NumberString))
-                        continue;
-
-                    output += AdjecentToGear(engineNum, values, numberGears);
-                    engineNum = new();
-                }
-            }
-            //91622824
-            return output;
-        }
-        //Can be shortened
-        private static int AdjecentToGear(NumberInEngine engineNum, string[] lines, Dictionary<string, int> numberGears)
-        {
-            string line = lines[engineNum.LineIndex];
-            if (engineNum.LineIndex != 0)
-            {
-                for (int k = engineNum.StartIndex - 1; k < engineNum.StartIndex + engineNum.Length + 1; k++)
-                {
-                    if (k < 0 || k >= line.Length)
-                        continue;
-                    if (lines[engineNum.LineIndex - 1][k] == '*')
-                    {
-                        string id = $"{engineNum.LineIndex - 1}{k}";
-                        int number = int.Parse(engineNum.NumberString);
-                        if (!numberGears.TryAdd(id, number))
-                            return int.Parse(engineNum.NumberString) * numberGears[id];
-                    }
-                }
-            }
-            if (engineNum.LineIndex != lines.Length - 1)
-            {
-                for (int k = engineNum.StartIndex - 1; k < engineNum.StartIndex + engineNum.Length + 1; k++)
-                {
-                    if (k < 0 || k >= line.Length)
-                        continue;
-                    if (lines[engineNum.LineIndex + 1][k] == '*')
-                    {
-                        string id = $"{engineNum.LineIndex + 1}{k}";
-                        int number = int.Parse(engineNum.NumberString);
-                        if (!numberGears.TryAdd(id, number))
-                            return int.Parse(engineNum.NumberString) * numberGears[id];
-                    }
-                }
-            }
-            if (engineNum.StartIndex != 0)
-            {
-                if (lines[engineNum.LineIndex][engineNum.StartIndex - 1] == '*')
-                {
-                    string id = $"{engineNum.LineIndex}{engineNum.StartIndex - 1}";
-                    int number = int.Parse(engineNum.NumberString);
-                    if (!numberGears.TryAdd(id, number))
-                        return int.Parse(engineNum.NumberString) * numberGears[id];
-                }
-            }
-            if (engineNum.StartIndex + engineNum.Length < line.Length)
-            {
-                if (lines[engineNum.LineIndex][engineNum.StartIndex + engineNum.Length] == '*')
-                {
-                    string id = $"{engineNum.LineIndex}{engineNum.StartIndex + engineNum.Length}";
-                    int number = int.Parse(engineNum.NumberString);
-                    if (!numberGears.TryAdd(id, number))
-                        return int.Parse(engineNum.NumberString) * numberGears[id];
-                }
-            }
-            return 0;
-        }
+        // Day 3
         private struct NumberInEngine
         {
             public string NumberString { get; set; }
@@ -354,7 +198,167 @@ namespace Advent_2023
             }
         }
 
-        //Day 4
+        public static int Day3_1(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int output = 0;
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                NumberInEngine engineNum = new();
+                for (int j = 0; j < line.Length; j++)
+                {
+                    if (int.TryParse(line[j].ToString(), out int num))
+                    {
+                        if (string.IsNullOrEmpty(engineNum.NumberString))
+                        {
+                            engineNum = new NumberInEngine(num.ToString(), j, i, 1);
+                            continue;
+                        }
+                        engineNum.NumberString += num;
+                        engineNum.Length++;
+                        if (j != line.Length - 1)
+                            continue;
+                    }
+                    if (string.IsNullOrEmpty(engineNum.NumberString))
+                        continue;
+                    if (AdjecentToSymbol(engineNum, lines))
+                        output += int.Parse(engineNum.NumberString);
+                    engineNum = new();
+                }
+            }
+
+            //560670
+            return output;
+        }
+        private static bool AdjecentToSymbol(NumberInEngine engineNum, string[] lines)
+        {
+            string line = lines[engineNum.LineIndex];
+            // Check top and bottom
+            for (int i = -1; i <= 1; i++)
+            {
+                if (i == 0)
+                    continue;
+
+                if ((engineNum.LineIndex == 0 && i != 1) || (engineNum.LineIndex == lines.Length - 1 && i != -1))
+                    continue;
+
+                for (int k = engineNum.StartIndex - 1; k < engineNum.StartIndex + engineNum.Length + 1; k++)
+                {
+                    if (k < 0 || k >= line.Length)
+                        continue;
+                    if (lines[engineNum.LineIndex + i][k] != '.')
+                        return true;
+                }
+
+            }
+
+            // Check left
+            if (engineNum.StartIndex != 0)
+            {
+                if (lines[engineNum.LineIndex][engineNum.StartIndex - 1] != '.')
+                    return true;
+            }
+
+            // Check right
+            if (engineNum.StartIndex + engineNum.Length < line.Length)
+            {
+                if (lines[engineNum.LineIndex][engineNum.StartIndex + engineNum.Length] != '.')
+                    return true;
+            }
+            return false;
+        }
+
+        public static int Day3_2(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int output = 0;
+
+            Dictionary<string, int> numberGears = new();
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                NumberInEngine engineNum = new();
+                for (int j = 0; j < line.Length; j++)
+                {
+                    if (int.TryParse(line[j].ToString(), out int num))
+                    {
+                        if (string.IsNullOrEmpty(engineNum.NumberString))
+                        {
+                            engineNum = new NumberInEngine(num.ToString(), j, i, 1);
+                            continue;
+                        }
+                        engineNum.NumberString += num;
+                        engineNum.Length++;
+                        if (j != line.Length - 1)
+                            continue;
+                    }
+                    if (string.IsNullOrEmpty(engineNum.NumberString))
+                        continue;
+
+                    output += AdjecentToGear(engineNum, lines, numberGears);
+                    engineNum = new();
+                }
+            }
+            //91622824
+            return output;
+        }
+        private static int AdjecentToGear(NumberInEngine engineNum, string[] lines, Dictionary<string, int> numberGears)
+        {
+            string line = lines[engineNum.LineIndex];
+            //Checks top and bottom
+            for (int i = -1; i <= 1; i++)
+            {
+                if (i == 0)
+                    continue;
+
+                if ((engineNum.LineIndex == 0 && i != 1) || (engineNum.LineIndex == lines.Length - 1 && i != -1))
+                    continue;
+
+                for (int k = engineNum.StartIndex - 1; k < engineNum.StartIndex + engineNum.Length + 1; k++)
+                {
+                    if (k < 0 || k >= line.Length)
+                        continue;
+                    if (lines[engineNum.LineIndex + i][k] == '*')
+                    {
+                        string id = $"{engineNum.LineIndex + i}{k}";
+                        int number = int.Parse(engineNum.NumberString);
+                        if (!numberGears.TryAdd(id, number))
+                            return number * numberGears[id];
+                    }
+                }
+
+            }
+
+            //Checks left
+            if (engineNum.StartIndex != 0)
+            {
+                if (lines[engineNum.LineIndex][engineNum.StartIndex - 1] == '*')
+                {
+                    string id = $"{engineNum.LineIndex}{engineNum.StartIndex - 1}";
+                    int number = int.Parse(engineNum.NumberString);
+                    if (!numberGears.TryAdd(id, number))
+                        return number * numberGears[id];
+                }
+            }
+
+            //Checks right
+            if (engineNum.StartIndex + engineNum.Length < line.Length)
+            {
+                if (lines[engineNum.LineIndex][engineNum.StartIndex + engineNum.Length] == '*')
+                {
+                    string id = $"{engineNum.LineIndex}{engineNum.StartIndex + engineNum.Length}";
+                    int number = int.Parse(engineNum.NumberString);
+                    if (!numberGears.TryAdd(id, number))
+                        return number * numberGears[id];
+                }
+            }
+            return 0;
+        }
+
+        // Day 4
     }
 
 
