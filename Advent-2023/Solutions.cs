@@ -359,6 +359,74 @@ namespace Advent_2023
         }
 
         // Day 4
+        public static int Day4_1(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int output = 0;
+            foreach (var line in lines)
+            {
+                int multiplier = 0;
+                string[] game = line.Split(':');
+                string[] sets = game[1].Split('|');
+                string[] winningNumbers = sets[0].Trim().Split(' ');
+                winningNumbers = winningNumbers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                string[] myNumbers = sets[1].Trim().Split(' ');
+                myNumbers = myNumbers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                foreach (var win in winningNumbers)
+                {
+                    if (myNumbers.Contains(win))
+                        multiplier++;
+                }
+                if (multiplier != 0)
+                    output += (int)Math.Pow((double)2, (double)multiplier - 1);
+            }
+            //32001
+            return output;
+        }
+
+        public static int Day4_2(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int output = lines.Length * 0;
+            output += SolveDay4_2(lines, 0, lines.Length);
+
+            return output;
+        }
+        private static int SolveDay4_2(string[] lines, int start, int length)
+        {
+            if (length == 0)
+                return 0;
+            int output = 0;
+            for (int i = start; i < start + length; i++)
+            {
+                int winNumbers = 0;
+                if (i >= lines.Length)
+                    break;
+                output += 1;
+                string line = lines[i];
+                string[] game = line.Split(':');
+                string[] sets = game[1].Split('|');
+
+                string[] winningNumbers = sets[0].Trim().Split(' ');
+                winningNumbers = winningNumbers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                string[] myNumbers = sets[1].Trim().Split(' ');
+                myNumbers = myNumbers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                foreach (var win in winningNumbers)
+                {
+                    if (myNumbers.Contains(win))
+                    {
+                        winNumbers++;
+                    }
+                }
+                output += SolveDay4_2(lines, i + 1, winNumbers);
+            }
+            //5037841
+            return output;
+        }
+
+        // Day 5
     }
 
 
