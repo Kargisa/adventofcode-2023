@@ -18,3 +18,9 @@ using System.Diagnostics;
 //Console.WriteLine(Solutions.Day4_2("../../../day4"));
 
 // Day 5
+//Console.WriteLine(Solutions.Day5_1("../../../day5"));
+
+
+// Day 6
+//Console.WriteLine(Solutions.Day6_1("../../../day6"));
+//Console.WriteLine(Solutions.Day6_2("../../../day6"));

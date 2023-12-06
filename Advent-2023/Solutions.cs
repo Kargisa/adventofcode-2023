@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -368,10 +369,13 @@ namespace Advent_2023
                 int multiplier = 0;
                 string[] game = line.Split(':');
                 string[] sets = game[1].Split('|');
+
                 string[] winningNumbers = sets[0].Trim().Split(' ');
                 winningNumbers = winningNumbers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
                 string[] myNumbers = sets[1].Trim().Split(' ');
                 myNumbers = myNumbers.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
                 foreach (var win in winningNumbers)
                 {
                     if (myNumbers.Contains(win))
@@ -427,6 +431,191 @@ namespace Advent_2023
         }
 
         // Day 5
+        public static long Day5_1(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int output = 0;
+
+            long[] seeds = lines[0].Split(':')[1].Trim().Split(' ').Select(s => long.Parse(s)).ToArray();
+            long[] destNums = seeds;
+            long[] bufferNums = new long[seeds.Length].Select(s => s = -1).ToArray();
+
+            for (int i = 3; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                if (line == "")
+                {
+                    i++;
+                    destNums = bufferNums;
+                    bufferNums = new long[seeds.Length].Select(s => s = -1).ToArray();
+                    continue;
+                }
+
+                string[] lineParts = line.Split(' ');
+                string[] numbers = line.Trim().Split(' ');
+
+                for (int j = 0; j < destNums.Length; j++)
+                {
+                    long num = destNums[j];
+                    long start = long.Parse(numbers[1]);
+                    long end = long.Parse(numbers[0]);
+                    long length = long.Parse(numbers[2]);
+
+                    if (num < start || num >= start + length)
+                    {
+                        if (bufferNums[j] == -1)
+                            bufferNums[j] = num;
+                        continue;
+                    }
+
+                    long diff = num - start;
+                    long newNum = end + diff;
+                    bufferNums[j] = newNum;
+                }
+            }
+
+            destNums = bufferNums;
+
+            //318728750
+            return destNums.Min();
+        }
+
+        public static long Day5_2(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            //lines = new string[]
+            //{
+            //    "seeds: 79 14 55 13"        ,
+            //    "seed-to-soil map:"         ,
+            //    "50 98 2"                   ,
+            //    "52 50 48"                  ,
+            //    ""                        ,
+            //    "soil-to-fertilizer map:"   ,
+            //    "0 15 37"                   ,
+            //    "37 52 2"                   ,
+            //    "39 0 15"                   ,
+            //    ""                        ,
+            //    "fertilizer-to-water map:"  ,
+            //    "49 53 8"                   ,
+            //    "0 11 42"                   ,
+            //    "42 0 7"                    ,
+            //    "57 7 4"                    ,
+            //    ""                        ,
+            //    "water-to-light map:"       ,
+            //    "88 18 7"                   ,
+            //    "18 25 70"                  ,
+            //    ""                        ,
+            //    "light-to-temperature map:" ,
+            //    "45 77 23"                  ,
+            //    "81 45 19"                  ,
+            //    "68 64 13"                  ,
+            //    ""                        ,
+            //    "temperature-to-humidity map:",
+            //    "0 69 1"                    ,
+            //    "1 0 69"                    ,
+            //    ""                        ,
+            //    "humidity-to-location map:" ,
+            //    "60 56 37"                  ,
+            //    "56 93 4"                   ,
+            //};
+            int output = 0;
+
+            long[] seeds = lines[0].Split(':')[1].Trim().Split(' ').Select(s => long.Parse(s)).ToArray();
+
+            //for (int i = 3; i < lines.Length; i++)
+            //{
+            //    string line = lines[i];
+            //    if (line == "")
+            //    {
+            //        i++;
+            //        destNums = bufferNums;
+            //        bufferNums = new();
+            //        continue;
+            //    }
+
+            //    string[] lineParts = line.Split(' ');
+            //    string[] lineNumbers = line.Trim().Split(' ');
+
+            //    for (int j = 0; j < destNums.Count; j += 2)
+            //    {
+            //        long num = destNums[j];
+            //        long numRange = destNums[j + 1];
+            //        long endRange = num + numRange - 1;
+
+            //        long start = long.Parse(lineNumbers[1]);
+            //        long end = long.Parse(lineNumbers[0]);
+            //        long length = long.Parse(lineNumbers[2]);
+            //        long endLineNumbers = start + length - 1;
+
+                    
+
+            //        long diff = num - start;
+
+            //        long newNum = end + diff;
+            //        bufferNums.Add(newNum);
+            //        bufferNums.Add(numRange);
+            //    }
+            //}
+
+            //destNums = bufferNums;
+
+            //List<long> final = new List<long>();
+
+            //for (int i = 0; i < destNums.Count; i += 2)
+            //{
+            //    final.Add(destNums[i]);
+            //    //Console.WriteLine("-----------");
+            //    //Console.WriteLine(destNums[i]);
+            //    //Console.WriteLine(destNums[i + 1]);
+            //}
+
+            ////
+            //return destNums.Min();
+            return 0;
+        }
+
+        // Day 6
+        public static int Day6_1(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            int output = 1;
+            int[] times = lines[0].Split(':')[1].Trim().Split(' ').Where(s => !string.IsNullOrEmpty(s)).Select(s => int.Parse(s)).ToArray();
+            int[] records = lines[1].Split(':')[1].Trim().Split(' ').Where(s => !string.IsNullOrEmpty(s)).Select(s => int.Parse(s)).ToArray();
+
+            for (int i = 0; i < times.Length; i++)
+            {
+                int time = times[i];
+                int possibleTimes = 0;
+                for(int j = 1; j <= time; j++)
+                {
+                    if ((time - j) * j > records[i])
+                        possibleTimes++;
+                }
+                output *= possibleTimes;
+            }
+            //588588
+            return output;
+        }
+
+        public static long Day6_2(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            long output = 0;
+            string[] timesRaw = lines[0].Split(':')[1].Trim().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+            string[] recordsRaw = lines[1].Split(':')[1].Trim().Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+            long time = long.Parse(string.Join("", timesRaw));
+            long record = long.Parse(string.Join("", recordsRaw));
+
+            for (int j = 1; j <= time; j++)
+            {
+                if ((time - j) * j > record)
+                    output++;
+            }
+            //34655848
+            return output;
+        }
+
     }
 
 
